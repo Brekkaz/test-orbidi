@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 from domain.entities.category import Category as CategoryEntity
 from uuid import UUID
 
+
 class CategoryRepository(ABC):
     @abstractmethod
     async def create(self, entity: CategoryEntity) -> None:
@@ -23,4 +24,14 @@ class CategoryRepository(ABC):
 
     @abstractmethod
     async def get_by_id(self, id: UUID) -> CategoryEntity:
+        pass
+
+    @abstractmethod
+    async def get_by_ids(self, ids: List[UUID]) -> List[CategoryEntity]:
+        """
+        Ejecuta una busqueda en la base de datos de todas las categorias 
+        que su id coincida con una lista de ids especificada.\n
+        Args:
+        ids: lista de ids a buscar.
+        """
         pass

@@ -15,6 +15,9 @@ class CategoryMutation:
 
     @strawberry.mutation()
     async def category_create(self, info: Info, data: CategoryInput) -> UUID:
+        """
+        Habilita la mutacion para crear categorias
+        """
         try:
             instance = data.to_pydantic().to_entity(id=uuid.uuid4())
             await info.context.category.create(entity=instance)
@@ -24,6 +27,9 @@ class CategoryMutation:
 
     @strawberry.mutation()
     async def category_update(self, info: Info, id: ID, data: CategoryInput) -> bool:
+        """
+        Habilita la mutacion para actualizar categorias
+        """
         try:
             instance = data.to_pydantic().to_entity(id=UUID(str(id)))
             await info.context.category.update(entity=instance)
@@ -33,6 +39,9 @@ class CategoryMutation:
 
     @strawberry.mutation()
     async def category_delete(self, info: Info, id: ID) -> bool:
+        """
+        Habilita la mutacion para eliminar categorias
+        """
         try:
             await info.context.category.delete(id=UUID(str(id)))
             return True

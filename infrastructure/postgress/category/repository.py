@@ -2,10 +2,10 @@ from typing import List
 
 from domain.repositories.category_repository import CategoryRepository
 from domain.entities.category import Category as CategoryEntity
-from infrastructure.postgress.category.models import CategoryModel
 from domain.utils.error_handling import AppError
 from infrastructure.postgress.connection import Database
 from uuid import UUID
+
 
 class PostgressCategoryRepository(CategoryRepository):
 
@@ -21,7 +21,8 @@ class PostgressCategoryRepository(CategoryRepository):
                     ($1, $2)
 
             """,
-            entity.id, entity.name
+            entity.id,
+            entity.name,
         )
 
     async def update(self, entity: CategoryEntity) -> None:
@@ -35,7 +36,8 @@ class PostgressCategoryRepository(CategoryRepository):
                     id = $1 
 
             """,
-            entity.id, entity.name
+            entity.id,
+            entity.name,
         )
 
     async def delete(self, id: UUID) -> None:
@@ -49,7 +51,7 @@ class PostgressCategoryRepository(CategoryRepository):
                     id = $1 
 
             """,
-            id
+            id,
         )
 
     async def get(self) -> List[CategoryEntity]:
@@ -77,10 +79,26 @@ class PostgressCategoryRepository(CategoryRepository):
                     id = $1 
                     AND deleted_at is null
             """,
-            id
+            id,
         )
 
         if result is None:
             raise AppError(detail="Category not found.", code=AppError.DATASOURCE_ERROR)
 
         return CategoryEntity(**result)
+
+    async def get_by_ids(self, ids: List[UUID]) -> List[CategoryEntity]:
+        results = await self.database.fetch_many(
+            """
+            SELECT 
+                *
+            FROM 
+                category 
+            WHERE 
+                deleted_at IS NULL
+                AND id = ANY($1)
+            """,
+            ids,
+        )
+
+        return [CategoryEntity(**result) for result in results]

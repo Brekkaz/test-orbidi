@@ -3,6 +3,9 @@ from strawberry.exceptions import StrawberryGraphQLError
 
 
 class AppError(BaseException):
+    """
+    Clase de implementacion global la cual sirve para estandarizar los errores
+    """
     CANCEL = "NONE"
     WAIT_AND_RETRY = "WAIT_AND_RETRY"
     RETRY = "RETRY"
@@ -18,21 +21,13 @@ class AppError(BaseException):
     def extend(self):
         return StrawberryGraphQLError(
             message=self.detail,
-            extensions={
-                "detail": self.detail,
-                "code": self.code,
-                "level": self.level
-            }
+            extensions={"detail": self.detail, "code": self.code, "level": self.level},
         )
 
     def error(self):
         return StrawberryGraphQLError(
             message=self.detail,
-            extensions={
-                "detail": self.detail,
-                "code": self.code,
-                "level": self.level
-            }
+            extensions={"detail": self.detail, "code": self.code, "level": self.level},
         ).__dict__
 
     @staticmethod

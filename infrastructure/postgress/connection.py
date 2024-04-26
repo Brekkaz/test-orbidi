@@ -4,8 +4,19 @@ import asyncpg
 
 
 class Database:
-    def __init__(self, user: str, password: str, host: str, port: str, database: str, min_pool_size: int = 10,
-                 max_pool_size: int = 10):
+    """
+    Administrador de base de datos postgress
+    """
+    def __init__(
+        self,
+        user: str,
+        password: str,
+        host: str,
+        port: str,
+        database: str,
+        min_pool_size: int = 10,
+        max_pool_size: int = 10,
+    ):
         self.user = user
         self.password = password
         self.host = host
@@ -18,6 +29,9 @@ class Database:
         self.connection_pool = None
 
     async def connect(self):
+        """
+        crea un pool de conexiones a la base de datos
+        """
         if not self.connection_pool:
             try:
                 self.connection_pool = await asyncpg.create_pool(
@@ -35,6 +49,9 @@ class Database:
                 print(e)
 
     async def fetch_one(self, query: str, *params):
+        """
+        Ejecuta consultas de unico resultado
+        """
         async with self.connection_pool.acquire() as conn:
             stm = await conn.prepare(query)
             result = await stm.fetchrow(*params)
@@ -42,6 +59,9 @@ class Database:
             return result
 
     async def fetch_many(self, query: str, *params):
+        """
+        Ejecuta consultas de multiples resultados
+        """
         async with self.connection_pool.acquire() as conn:
             stm = await conn.prepare(query)
             result = await stm.fetch(*params)
@@ -49,18 +69,27 @@ class Database:
             return result
 
     async def execute(self, query: str, *params):
+        """
+        Ejecuta comandos de unica sentencia
+        """
         async with self.connection_pool.acquire() as conn:
             result = await conn.execute(query, *params)
             logging.info(f"Results {result}")
             return result
 
     async def execute_many(self, query: str, values):
+        """
+        Ejecuta comandos de multiples sentencias
+        """
         async with self.connection_pool.acquire() as conn:
             result = await conn.executemany(query, values)
             logging.info(f"Results {result}")
             return result
 
     async def close(self):
+        """
+        Cierra la conexion 
+        """
         if not self.connection_pool:
             try:
                 await self.connection_pool.close()
